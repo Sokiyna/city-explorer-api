@@ -3,6 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const weatherData = require('./assets/whether.json');
+const axios = require('axios');
+
 
 
 const server = express();
@@ -10,43 +12,86 @@ server.use(cors());
 
 const PORT = process.env.PORT;
 
-class Forecast {
-    constructor(date, description) {
-        this.date = date;
-        this.description = description;
+// const movieHandler = require('/movie');
+
+// const weatherHandler = require('/weather');
+server.get('/weather', weatherHandler);
+
+class Forecast{
+    constructor(day){
+
+        this.date = day.valid_date;
+        this.description = day.weather.description;
     }
+
+    
+
 }
 
-server.get('/weather', (req, res) => {
-    let cityNameData = req.query.cityName;
-    let lat = req.query.lat;
-    let lon = req.query.lon;
-    let searchQuery = weatherData.find(item => {
-        if (cityNameData.toLowerCase() == item.city_name.toLowerCase() && lat == item.lat && lon == item.lon)
-            return item;
-    })
+function weatherHandler(req, res) {
+    let keyWeather = process.env.WEATHER_API_KEY;
+    let cityName = req.query.cityName;
+
+    let weatherUrl = `https://api.weatherbit.io/v2.0/forecast/daily?city=${cityName}&key=${keyWeather}&days=3`;
+    axios
+        .get(weatherUrl)
+        .then(result => {
+            const weatherArr = result.data.data.map(item => {
+                return new Forecast(item)
+            })
+            res.send(weatherArr);
+
+        })
 
 
-    try {
-        let forcastArr = [];
-        let date;
-        let description;
-        let forcastData;
-        for (let i = 0; i < searchQuery.data.length; i++) {
-            date = searchQuery.data[i].valid_date;
-            description = `Low of ${searchQuery.data[i].low_temp}, high of ${searchQuery.data[i].max_temp} with ${searchQuery.data[i].weather.description}`;
-            forcastData = new Forecast(date, description);
-            forcastArr.push(forcastData);
-        }
-        res.send(forcastArr);
-    } catch (par) {
 
-        res.send('error not found');
-    }
+        .catch(error => res.status(500).send(`Not found ${error}`))
 
-})
+}
+
+// let searchQuery = weatherData.find(item => {
+//     // console.log(item, "hoiiiiiiiiiiiiii");
+//     if (cityNameData.toLowerCase() == item.city_name.toLowerCase() && lat == item.lat && lon == item.lon)
+//         return item;
+// })
 
 
+
+
+
+
+
+
+
+
+
+
+// server.get('/weather', (req, res) => {
+//     let cityNameData = req.query.cityName;
+//     // console.log(cityNameData, "hiiiiiiiiiii");
+  
+//     // let searchQuery = weatherData.find(item => {
+//     //     // console.log(item, "hoiiiiiiiiiiiiii");
+//     //     if (cityNameData.toLowerCase() == item.city_name.toLowerCase())
+//     //         return item;
+//     // })
+
+
+//     try {
+        
+//         let weatherData = searchQuery.data.map(item => new Forecast(item))
+
+//         res.send(weatherData);
+//     } catch (par) {
+
+//         res.send('error not found');
+//     }
+
+// })
+
+// server.get('*', (req, res) => {
+//     res.status(404).send('not found')
+// })
 
 server.listen(PORT, () => {
     console.log(`listtening on PORT ${PORT}`)
