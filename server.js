@@ -49,6 +49,48 @@ function weatherHandler(req, res) {
 
 }
 
+server.get('/movie', movieHandler);
+
+class Movie{
+    constructor(details){
+        this.releaseDate = details.release_date;
+        this.title = details.original_title;
+        this.totalVotes = details.vote_count;
+        this.imagePath = `https://image.tmdb.org/t/p/w500${details.poster_path}`;
+    }
+
+    
+
+}
+
+
+function movieHandler(req, res) {
+
+    let keyMovie = process.env.MOVIE_API_KEY;
+    let cityMovie = req.query.cityName;
+    // let lat = req.query.lat;
+    // let long = req.query.long;
+
+    let MovieUrl = `https://api.themoviedb.org/3/search/movie?api_key=${keyMovie}&query=${cityMovie}`;
+
+    axios.get(MovieUrl)
+        .then(result => {
+            const movieArr = result.data.results.map(elemnt => {
+                return new Movie(elemnt);
+            })
+            // console.log(movieArr);
+            res.send(movieArr);
+        })
+
+
+        .catch(error => {
+            console.log(error);
+            res.status(500).send(`Not found ${error}`);
+
+        })
+
+}
+
 // let searchQuery = weatherData.find(item => {
 //     // console.log(item, "hoiiiiiiiiiiiiii");
 //     if (cityNameData.toLowerCase() == item.city_name.toLowerCase() && lat == item.lat && lon == item.lon)
