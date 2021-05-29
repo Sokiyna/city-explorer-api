@@ -135,9 +135,9 @@ server.get('/weather', weatherHandler);
 
 // })
 
-// server.get('*', (req, res) => {
-//     res.status(404).send('not found')
-// })
+server.get('*', (req, res) => {
+    res.status(404).send('not found')
+})
 
 server.listen(PORT, () => {
     console.log(`listtening on PORT ${PORT}`)

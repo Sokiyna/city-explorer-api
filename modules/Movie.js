@@ -27,9 +27,9 @@ function movieHandler(req, res) {
     // let lat = req.query.lat;
     // let long = req.query.long;
 
-    if (merory[cityName] !== undefined) {
+    if (merory[cityMovie] !== undefined) {
         console.log('this datat from me');
-        res.send(merory[cityName]);
+        res.send(merory[cityMovie]);
     } else {
         console.log('this datat from me');
 
@@ -44,7 +44,7 @@ function movieHandler(req, res) {
                     // console.log(movieArr);
                     res.send(movieArr);
                 })
-            merory[cityName] = movieArr;
+            merory[cityMovie] = movieArr;
             res.send(movieArr);
 
         }catch{(error =>res.status(500).send(`Not found ${error}`));
